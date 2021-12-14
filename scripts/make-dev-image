@@ -6,9 +6,9 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 . $SCRIPT_DIR/common.sh
 
-COLLECTD_VERSION=${COLLECTD_VERSION} COLLECTD_COMMIT=${COLLECTD_COMMIT} do_docker_build signalfx-agent-dev-cache stage-agent-builder agent-builder latest
+COLLECTD_VERSION=${COLLECTD_VERSION} COLLECTD_COMMIT=${COLLECTD_COMMIT} do_docker_build signalfx-agent-dev-cache stage-agent-builder agent-builder "$($SCRIPT_DIR/current-version)"
 
-COLLECTD_VERSION=${COLLECTD_VERSION} COLLECTD_COMMIT=${COLLECTD_COMMIT} do_docker_build signalfx-agent-dev-cache stage-final-image final-image latest
+COLLECTD_VERSION=${COLLECTD_VERSION} COLLECTD_COMMIT=${COLLECTD_COMMIT} do_docker_build signalfx-agent-dev-cache stage-final-image final-image "$($SCRIPT_DIR/current-version)"
 
 target_arch="amd64"
 if [ "$(uname -m)" == "aarch64" ]; then
