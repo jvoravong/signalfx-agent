@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"gopkg.in/fatih/set.v0"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -47,11 +48,25 @@ type Config struct {
 	// (the default).
 	MetricPath string `yaml:"metricPath" default:"/metrics"`
 
+	// Control what log level to use if a scrape failure occurs for a metric
+	// exporter target. Modifying this configuration is useful for less stable
+	// targets.  Only the debug, info, warn, and error log levels are supported.
+	ScrapeFailureLogLevel string `yaml:"scrapeFailureLogLevel" default:"error"`
+
 	// Send all the metrics that come out of the Prometheus exporter without
 	// any filtering.  This option has no effect when using the prometheus
 	// exporter monitor directly since there is no built-in filtering, only
 	// when embedding it in other monitors.
 	SendAllMetrics bool `yaml:"sendAllMetrics"`
+}
+
+func (c *Config) Validate() error {
+	var validScrapeFailureLogLevels = set.NewNonTS("debug", "info", "warn", "error")
+	if !validScrapeFailureLogLevels.Has(c.ScrapeFailureLogLevel) {
+		return fmt.Errorf("invalid prometheus failure log level %s, valid choices are %v",
+			c.ScrapeFailureLogLevel, validScrapeFailureLogLevels)
+	}
+	return nil
 }
 
 func (c *Config) GetExtraMetrics() []string {
@@ -76,9 +91,10 @@ type Monitor struct {
 	// If true, IncludedMetrics is ignored and everything is sent.
 	SendAll bool
 
-	monitorName string
-	logger      logrus.FieldLogger
-	cancel      func()
+	monitorName        string
+	logger             logrus.FieldLogger
+	loggerFailureLevel logrus.Level
+	cancel             func()
 }
 
 type fetcher func() (io.ReadCloser, expfmt.Format, error)
@@ -86,7 +102,7 @@ type fetcher func() (io.ReadCloser, expfmt.Format, error)
 // Configure the monitor and kick off volume metric syncing
 func (m *Monitor) Configure(conf *Config) error {
 	m.logger = logrus.WithFields(logrus.Fields{"monitorType": m.monitorName})
-
+	m.loggerFailureLevel, _ = logrus.ParseLevel(conf.ScrapeFailureLogLevel)
 	var bearerToken string
 
 	if conf.UseServiceAccount {
@@ -138,7 +154,8 @@ func (m *Monitor) Configure(conf *Config) error {
 	utils.RunOnInterval(ctx, func() {
 		dps, err := fetchPrometheusMetrics(fetch)
 		if err != nil {
-			m.logger.WithError(err).Error("Could not get prometheus metrics")
+			// The log level is error unless otherwise configured.
+			m.logger.WithError(err).Log(m.loggerFailureLevel, "Could not get prometheus metrics")
 			return
 		}
 

@@ -111,6 +111,7 @@ Configuration](../monitor-config.md#common-configuration).**
 | `port` | **yes** | `integer` | Port of the exporter |
 | `useServiceAccount` | no | `bool` | Use pod service account to authenticate. (**default:** `false`) |
 | `metricPath` | no | `string` | Path to the metrics endpoint on the exporter server, usually `/metrics` (the default). (**default:** `/metrics`) |
+| `scrapeFailureLogLevel` | no | `string` | The log level to use if metric scrape failures occur for the target exporter. Modifying this configuration is useful for less stable targets. The supported values are `debug`, `info`, `warn`, and `error`. (**default:** `error`) |
 | `sendAllMetrics` | no | `bool` | Send all the metrics that come out of the Prometheus exporter without any filtering.  This option has no effect when using the prometheus exporter monitor directly since there is no built-in filtering, only when embedding it in other monitors. (**default:** `false`) |
 
 

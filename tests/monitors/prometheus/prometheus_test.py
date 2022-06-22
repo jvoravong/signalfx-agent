@@ -18,6 +18,7 @@ def test_prometheus_exporter():
                  - type: prometheus-exporter
                    host: {container_ip(dpgen_cont)}
                    port: 3000
+                   scrapeFailureLogLevel: debug
                    intervalSeconds: 2
                    extraDimensions:
                      source: prometheus
