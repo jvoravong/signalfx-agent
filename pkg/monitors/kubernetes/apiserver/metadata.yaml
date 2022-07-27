@@ -512,7 +512,7 @@ monitors:
       type: cumulative
       group: apiserver_request
     apiserver_request_duration_seconds_count:
-      default: false
+      default: true
       description: Response latency distribution in seconds for each verb, dry run
         value, group, version, resource, subresource, scope and component. (count)
       type: cumulative
@@ -985,7 +985,7 @@ monitors:
       type: cumulative
       group: etcd
     etcd_helper_cache_hit:
-      default: false
+      default: true
       description: Counter of etcd helper cache hits.
       type: cumulative
       group: etcd
@@ -995,7 +995,7 @@ monitors:
       type: cumulative
       group: etcd
     etcd_helper_cache_miss:
-      default: false
+      default: true
       description: Counter of etcd helper cache miss.
       type: cumulative
       group: etcd
@@ -1010,7 +1010,7 @@ monitors:
       type: cumulative
       group: etcd
     etcd_request_cache_add_duration_seconds:
-      default: false
+      default: true
       description: Latency in seconds of adding an object to etcd cache (sum)
       type: cumulative
       group: etcd
@@ -1043,7 +1043,7 @@ monitors:
       type: cumulative
       group: etcd
     etcd_request_cache_get_duration_seconds:
-      default: false
+      default: true
       description: Latency in seconds of getting an object from etcd cache (sum)
       type: cumulative
       group: etcd
